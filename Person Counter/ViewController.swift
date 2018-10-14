@@ -20,6 +20,9 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Hide the Volume UI
+        hideVolumeUI()
+        
         // Listen for volume button presses
         listenForVolumeButtonPresses()
     }
@@ -41,6 +44,8 @@ class ViewController: UIViewController {
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == "outputVolume"{
             let audioSession = AVAudioSession.sharedInstance()
+            print("System volume before: \(audioLevel)")
+            
             if audioSession.outputVolume > audioLevel {
                 print("Volume up pressed")
                 increaseCounter()
@@ -64,6 +69,8 @@ class ViewController: UIViewController {
                 (MPVolumeView().subviews.filter{NSStringFromClass($0.classForCoder) == "MPVolumeSlider"}.first as? UISlider)?.setValue(0.0625, animated: false)
                 audioLevel = 0.0625
             }
+            
+            print("System volume after: \(audioLevel)")
         }
     }
     
@@ -75,6 +82,19 @@ class ViewController: UIViewController {
     func decreaseCounter() {
         currentCount -= 1
         personCount.text = String(currentCount)
+    }
+    
+    func hideVolumeUI() {
+        let volumeView = MPVolumeView(frame: CGRect.zero)
+        for subview in volumeView.subviews {
+            if let button = subview as? UIButton {
+                button.setImage(nil, for: .normal)
+                button.isEnabled = false
+                button.sizeToFit()
+            }
+        }
+        UIApplication.shared.windows.first?.addSubview(volumeView)
+        UIApplication.shared.windows.first?.sendSubviewToBack(volumeView)
     }
 }
 
