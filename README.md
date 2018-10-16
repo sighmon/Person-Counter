@@ -4,7 +4,7 @@ An iOS person counter that sends data to MuseumOS
 
 ## TODO
 
-* Find a workaround to set MPVolumeSlider value in iOS 12
+* Find a workaround to set MPVolumeSlider value in iOS 12 (See: [JPSVolumeButtonHandler](https://github.com/jpsim/JPSVolumeButtonHandler))
 * Implement location services
 * Send json to MuseumOS
 
