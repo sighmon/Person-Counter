@@ -23,7 +23,7 @@ class ViewController: UIViewController {
         // Hide the Volume UI
         hideVolumeUI()
         
-        // Listen for volume button presses
+        // Set ourselves to observe for volume button presses
         listenForVolumeButtonPresses()
     }
     
@@ -42,6 +42,7 @@ class ViewController: UIViewController {
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        // Volume buttons observer
         if keyPath == "outputVolume"{
             let audioSession = AVAudioSession.sharedInstance()
             print("System volume before: \(audioLevel)")
@@ -60,18 +61,26 @@ class ViewController: UIViewController {
             
             // Avoid maximum system volume
             if audioSession.outputVolume > 0.999 {
-                (MPVolumeView().subviews.filter{NSStringFromClass($0.classForCoder) == "MPVolumeSlider"}.first as? UISlider)?.setValue(0.9375, animated: false)
+                setMPVolumeSlider(volume: 0.9375)
                 audioLevel = 0.9375
             }
             
             // Avoid minimum system volume
             if audioSession.outputVolume < 0.001 {
-                (MPVolumeView().subviews.filter{NSStringFromClass($0.classForCoder) == "MPVolumeSlider"}.first as? UISlider)?.setValue(0.0625, animated: false)
+                setMPVolumeSlider(volume: 0.0625)
                 audioLevel = 0.0625
             }
             
+            // Send count to MuseumOS
+            sendToMuseumOS()
+            
             print("System volume after: \(audioLevel)")
         }
+    }
+    
+    func setMPVolumeSlider(volume: Float) {
+        // TOFIX: This doesn't work in iOS 12 - investigate private APIs?
+        (MPVolumeView().subviews.filter{NSStringFromClass($0.classForCoder) == "MPVolumeSlider"}.first as? UISlider)?.setValue(volume, animated: false)
     }
     
     func increaseCounter() {
@@ -82,6 +91,13 @@ class ViewController: UIViewController {
     func decreaseCounter() {
         currentCount -= 1
         personCount.text = String(currentCount)
+    }
+    
+    func sendToMuseumOS() {
+        // TODO: post to MuseumOS
+        // currentCount
+        // location
+        // appID?
     }
     
     func hideVolumeUI() {
